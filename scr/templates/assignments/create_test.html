@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Составить тест для {{ assignment.assignment_name }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        <div id="question-form-list">
+        </div>
+        <button type="button" id="add-question">Добавить вопрос</button>
+        <button type="submit">Сохранить тест</button>
+    </form>
+
+    <div id="empty-form" style="display:none;">
+        <div class="question-form">
+            {{ formset.empty_form.question_text.label_tag }} {{ formset.empty_form.question_text }}
+            {{ formset.empty_form.points.label_tag }} {{ formset.empty_form.points }}
+            <a href="javascript:void(0)" class="delete-question">Удалить вопрос</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#add-question').click(function () {
+                var formIdx = $('#id_form-TOTAL_FORMS').val();
+                $('#question-form-list').append($('#empty-form').html().replace(/__prefix__/g, formIdx));
+                $('#id_form-TOTAL_FORMS').val(parseInt(formIdx) + 1);
+            });
+            $(document).on('click', '.delete-question', function () {
+                $(this).prev('input[type=hidden]').val('True');
+                $(this).parent('.question-form').hide();
+                var formIdx = $('#id_form-TOTAL_FORMS').val();
+                $('#id_form-TOTAL_FORMS').val(parseInt(formIdx) - 1);
+            });
+        });
+    </script>
+{% endblock %}

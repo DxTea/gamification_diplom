@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Мои курсы{% endblock %}
+
+{% block content %}
+    <h1 style="text-align: center;">Мои курсы</h1>
+    <div class="courses-container">
+        {% for course in courses %}
+            <div class="course-card">
+                <h2><a href="{{ course.id }}">{{ course.title }}</a></h2>
+                <p>{{ course.description }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    {% if request.user.role == 'teacher' %}
+        <button onclick="location.href='{% url 'courses:course_create' %}'">Добавить курс</button>
+    {% endif %}
+{% endblock %}

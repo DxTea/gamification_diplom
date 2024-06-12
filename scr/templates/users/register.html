@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block navbar %}
+    <button onclick="showLoginForm()">Войти</button>
+{% endblock %}
+
+{% block content %}
+    <h1>Регистрация</h1>
+    <form class="register-form" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <script>
+            var role = document.getElementById("id_role");
+            var group = document.getElementById("id_group").parentNode;
+
+            function showGroup() {
+                if (role.value === "student") {
+                    group.style.display = "block";
+                } else {
+                    group.style.display = "none";
+                }
+            }
+
+            role.onchange = showGroup;
+            showGroup();
+        </script>
+        <input type="submit" value="Зарегистрироваться">
+    </form>
+{% endblock %}

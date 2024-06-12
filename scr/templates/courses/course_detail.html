@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ course.title }}</h1>
+    <p>{{ course.description }}</p>
+    <p>Преподаватель: {{ course.teacher.get_full_name }}</p>
+    <div>
+        <button onclick="toggleGroups()">Группы</button>
+        <div id="groups-list" class="groups-list display-none">
+            {% for group in course.groups.all %}
+                <div class="list-group-item">МЕН-{{ group.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% if request.user.role == 'student' %}
+        <h2>Прогресс курса</h2>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: {{ progress }}%;"></div>
+        </div>
+        <p>Полученно баллов: {{ earned_points }} из {{ total_points }}</p>
+        <div class="hp-bar-container">
+            <div class="hp-bar" style="width: {{ hp }}%;"></div>
+        </div>
+        {% if hp > 0 %}
+            <p>HP: {{ hp }}/100</p>
+        {% else %}
+            <p>Ваше здоровье опустилось до 0, вы провалили курс :(</p>
+            <p>Свяжитесь с преподавателем по почте {{ course.teacher.email }}</p>
+        {% endif %}
+    {% endif %}
+
+    <div>
+        <button onclick="toggleAssignments()">Задания</button>
+        <ul id="assignments-list" style="display: none;">
+            {% for assignment in course.assignments.all %}
+                <li>
+                    <a href="{% url 'assignments:assignment_detail' assignment.id %}">{{ assignment.get_assignment_type_display }}: {{ assignment.assignment_name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% if request.user.role == 'teacher' and request.user == course.teacher %}
+        <a href="{% url 'courses:assignments:assignment_create' course.id %}">Добавить задание</a>
+        <a href="{% url 'assignments:review_assignments' course.id %}">Проверить задания</a>
+        <a href="{% url 'courses:course_edit' course.id %}">Редактировать курс</a>
+        <a href="{% url 'courses:course_delete' course.id %}">Удалить курс</a>
+    {% endif %}
+    <a href="{% url 'courses:courses_list' %}">Назад</a>
+{% endblock %}

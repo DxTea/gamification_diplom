@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ course.title }}</h1>
+    <a href="{% url 'courses:course_detail' course.id %}">Назад</a>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="width: 60%;">
+            <h2>Непроверенные работы</h2>
+            {% for assignment in unreviewed_assignments %}
+                <div class="review">
+                    <p>{{ assignment.assignment.assignment_name }}</p>
+                    <p>{{ assignment.student.get_full_name }}</p>
+                    {% if assignment.file %}
+                        <p>
+                            <a href="{% url 'assignments:download' path=assignment.file.name %}">{{ assignment.filename }}</a>
+                        </p>
+                    {% endif %}
+                    <p>{{ assignment.submitted_at }}</p>
+                    <form method="POST" action="{% url 'assignments:grade_assignment' assignment.id %}">
+                        {% csrf_token %}
+                        <p style="width:300px;"><input type="number" name="grade" min="0" max="100">
+                            <button type="submit">Подтвердить</button>
+                        </p>
+                    </form>
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
+        <div style="border-left: 1px solid #000; height: auto; margin: 0 20px;"></div>
+        <div style="width: 60%;">
+            <h2>Проверенные работы</h2>
+            {% for assignment in reviewed_assignments %}
+                <div class="review">
+                    <p>{{ assignment.assignment.assignment_name }}</p>
+                    <p>{{ assignment.student.get_full_name }}</p>
+                    {% if assignment.file %}
+                        <p>
+                            <a href="{% url 'assignments:download' path=assignment.file.name %}">{{ assignment.filename }}</a>
+                        </p>
+                    {% endif %}
+                    <p>{{ assignment.submitted_at }}</p>
+                    <p>Оценка: {{ assignment.grade }}</p>
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

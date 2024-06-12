@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Создать персонажа</h1>
+    <div class="character-form">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.name.label_tag }} {{ form.name }}
+            <label for="{{ form.default_avatar.auto_id }}">Default Avatar:</label>
+            <select id="{{ form.default_avatar.auto_id }}" name="{{ form.default_avatar.name }}">
+                {% for value, display in form.default_avatar.field.choices %}
+                    <option value="{{ value }}">{{ display }}</option>
+                {% endfor %}
+            </select>
+            <label for="{{ form.avatar.auto_id }}">Or upload your own:</label>
+            {{ form.avatar }}
+            <img id="avatar-preview" src="" alt="Avatar preview" style="width: 100px; height: 100px;">
+            {{ form.level.label_tag }} {{ form.level }}
+            {{ form.experience.label_tag }} {{ form.experience }}
+            <button type="submit">Создать персонажа</button>
+        </form>
+    </div>
+{% endblock %}

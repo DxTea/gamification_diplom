@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Моя доска</h1>
+    {% for course_info in courses_info %}
+        {% if request.user.role == 'teacher' %}
+            <h2 class="course-title-teacher" style="cursor: pointer;">Курс: {{ course_info.course.title }}</h2>
+            <div class="course-groups" style="display: none;">
+                {% for group_info in course_info.groups_info %}
+                    <h3 class="group-title" style="cursor: pointer;">Группа: {{ group_info.group.name }}</h3>
+                    <ul class="group-students" style="display: none;">
+                        {% for student_info in group_info.students_info %}
+                            <li>{{ student_info.student.get_full_name }}</li>
+                            <span> - Получено баллов: {{ student_info.total_points }} из {{ course_info.total_possible_points }}</span>
+                        {% empty %}
+                            <li>В группе нет студентов</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if request.user.role == 'student' %}
+            <h2 class="course-title-student" style="cursor: pointer;">Курс: {{ course_info.course.title }}</h2>
+            <div class="unsubmitted-assignments" style="display: none;">
+                <h3 class="deck">Несданные работы:</h3>
+                {% if course_info.unsubmitted_assignments %}
+                    <ul>
+                        {% for assignment in course_info.unsubmitted_assignments %}
+                            <li>
+                                <a href="{% url 'assignments:assignment_detail' assignment.id %}">{{ assignment.assignment_name }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Нет несданных работ</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <script>
+        var courseTitlesStudent = document.getElementsByClassName("course-title-student");
+        for (var i = 0; i < courseTitlesStudent.length; i++) {
+            courseTitlesStudent[i].addEventListener("click", function () {
+                var unsubmittedAssignments = this.nextElementSibling;
+                if (unsubmittedAssignments.style.display === "none") {
+                    unsubmittedAssignments.style.display = "block";
+                } else {
+                    unsubmittedAssignments.style.display = "none";
+                }
+            });
+        }
+    </script>
+    <script>
+        var courseTitlesTeacher = document.getElementsByClassName("course-title-teacher");
+        for (var i = 0; i < courseTitlesTeacher.length; i++) {
+            courseTitlesTeacher[i].addEventListener("click", function () {
+                var courseGroups = this.nextElementSibling;
+                if (courseGroups.style.display === "none") {
+                    courseGroups.style.display = "block";
+                } else {
+                    courseGroups.style.display = "none";
+                }
+            });
+        }
+    </script>
+    <script>
+        var groupTitles = document.getElementsByClassName("group-title");
+        for (var i = 0; i < groupTitles.length; i++) {
+            groupTitles[i].addEventListener("click", function () {
+                var groupStudents = this.nextElementSibling;
+                if (groupStudents.style.display === "none") {
+                    groupStudents.style.display = "block";
+                } else {
+                    groupStudents.style.display = "none";
+                }
+            });
+        }
+    </script>
+{% endblock %}
