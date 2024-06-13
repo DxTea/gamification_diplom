@@ -1,0 +1,52 @@
+<script>
+    function showLoginForm() {
+        var x = document.getElementById("loginForm");
+        if (x.style.display === "none") {
+            x.style.display = "flex";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+    function showGroup() {
+        var role = document.getElementById("role");
+        var group = document.getElementById("group");
+        var groupLabel = document.getElementById("group-label");
+        if (role.value === "student") {
+            group.style.display = "block";
+            groupLabel.style.display = "block";
+        } else {
+            group.style.display = "none";
+            groupLabel.style.display = "none";
+        }
+    }
+
+    function toggleRewards() {
+        var rewardsList = document.getElementById("rewards-list");
+        if (rewardsList.style.display === "none") {
+            rewardsList.style.display = "flex";
+        } else {
+            rewardsList.style.display = "none";
+        }
+    }
+
+    function toggleGroups() {
+        var groupsList = document.getElementById("groups-list");
+        if (groupsList.classList.contains('display-none')) {
+            groupsList.classList.remove('display-none');
+            groupsList.classList.add('display-flex');
+        } else {
+            groupsList.classList.remove('display-flex');
+            groupsList.classList.add('display-none');
+        }
+    }
+
+    function toggleAssignments() {
+        var x = document.getElementById("assignments-list");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>

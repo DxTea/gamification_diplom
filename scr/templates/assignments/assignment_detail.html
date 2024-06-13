@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load tz %}
+{% get_current_timezone as TIME_ZONE %}
+{% block content %}
+    <h1>{{ assignment.assignment_name }}</h1>
+    <p>{{ assignment.description }}</p>
+    {% if assignment.assignment_type != "theory" %}
+        <p>Срок сдачи: {{ assignment.due_date }}</p>
+    {% endif %}
+    <p>Тип задания: {{ assignment.get_assignment_type_display }}</p>
+    {% if assignment.weight %}
+        <p>Вес задания: {{ assignment.weight }}</p>
+    {% endif %}
+    {% if request.user.role == 'student' %}
+        {% if assignment.file %}
+            <p><a href="{% url 'assignments:download' path=assignment.file.name %}">Скачать файл с теорией</a></p>
+        {% else %}
+            <p>Файл с теорией отсутствует.</p>
+        {% endif %}
+        {% if submitted_assignment.reviewed %}
+            <p>Статус: Проверено</p>
+            <p>Оценка: {{ submitted_assignment.grade }}</p>
+        {% else %}
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-field">
+                        {% if field.field.widget.input_type == "file" and submitted_assignment and submitted_assignment.file %}
+                            <p>Загруженный файл: <a
+                                    href="{% url 'assignments:download' path=submitted_assignment.file.name %}">{{ submitted_assignment.filename }}</a>
+                            </p>
+
+                            <p>Время
+                                сдачи: {{ submitted_assignment.submitted_at|timezone:TIME_ZONE|date:"d.m.Y H:i" }}</p>
+                            <p>Статус: Отправлено на проверку</p>
+                            <label for="{{ field.id_for_label }}">Загрузить новый файл:</label>
+                        {% endif %}
+
+                        <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}"
+                               id="{{ field.auto_id }}" {% if field.field.required %}required{% endif %}>
+                        {% if field.errors %}
+                            <div class="error">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% if submitted_assignment %}
+                    <p>Теория сдана</p>
+                {% endif %}
+                {% if submitted_assignment.reviewed %}
+                    <p>Теория сдана</p>
+                {% endif %}
+                {% if assignment.assignment_type == "theory" and submitted_assignment.reviewed %}
+                    <p>Теория сдана</p>
+                {% else %}
+                    <button type="submit">Сдать задание</button>
+                {% endif %}
+            </form>
+        {% endif %}
+    {% endif %}
+    {% if assignment.get_assignment_type_display == "Тест" and request.user.role == 'teacher' and request.user == assignment.course.teacher %}
+        <a href="{% url 'assignments:create_test' assignment.id %}">Составить тест</a>
+    {% endif %}
+    {% if request.user.role == 'teacher' and request.user == assignment.course.teacher %}
+        <a href="{% url 'assignments:assignment_edit' assignment.id %}">Редактировать задание</a>
+        <a href="{% url 'assignments:assignment_delete' assignment.id %}">Удалить задание</a>
+    {% endif %}
+    <a href="/courses/{{ assignment.course.id }}">Назад</a>
+{% endblock %}
